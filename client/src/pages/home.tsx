@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Moon, Sun, AlertTriangle, Heart, Sparkles, Shield, Clock, ChevronRight } from "lucide-react";
+import { Moon, Sun, AlertTriangle, Heart, Sparkles, Shield, Clock, ChevronRight, HelpCircle } from "lucide-react";
 import { useTheme } from "@/lib/theme-provider";
 import type { LabEntry, HistoricalPoint, PatientContext } from "@shared/schema";
 import { buildAnalysisPrompt } from "@/lib/prompts";
@@ -10,6 +10,7 @@ import { StepPatient } from "@/components/step-patient";
 import { StepHistory } from "@/components/step-history";
 import { StepAnalyze } from "@/components/step-analyze";
 import { StepResults } from "@/components/step-results";
+import { Onboarding, useOnboarding } from "@/components/onboarding";
 
 const STEPS = [
   { n: 1, label: "Your Labs" },
@@ -21,6 +22,7 @@ const STEPS = [
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
+  const { showOnboarding, completeOnboarding, resetOnboarding } = useOnboarding();
   const [step, setStep] = useState(1);
   const [labs, setLabs] = useState<LabEntry[]>([]);
   const [ctx, setCtx] = useState<PatientContext>({});
@@ -101,6 +103,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
+      {showOnboarding && <Onboarding onComplete={completeOnboarding} />}
       <header className="sticky top-0 z-50 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground shadow-md">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
@@ -116,8 +119,19 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Badge variant="secondary" className="text-xs bg-white/15 text-white border-white/20 hidden sm:flex">
-              MedGemma
+              MedGemma 4B-IT
             </Badge>
+            <Button
+              size="icon"
+              variant="ghost"
+              onClick={resetOnboarding}
+              className="text-white"
+              data-testid="button-take-tour"
+              title="Take a tour"
+              aria-label="Take a guided tour"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </Button>
             <Button
               size="icon"
               variant="ghost"
@@ -311,7 +325,7 @@ export default function Home() {
             Educational tool only — always share results with your transplant team
           </div>
           <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground/60">
-            <span>Powered by MedGemma</span>
+            <span>Powered by MedGemma 4B-IT via FriendliAI</span>
             <span>|</span>
             <span className="flex items-center gap-1">
               Made with <Heart className="w-3 h-3 text-primary/50 inline" /> for transplant patients
